@@ -11,8 +11,8 @@ import { isEmpty } from "../../utils/index";
 
 import styles from "../../styles/coffee-store.module.css";
 
-export const getStaticProps = async ({ params }) => {
-  // const params = staticProps.params;
+export const getStaticProps = async (staticProps) => {
+  const params = staticProps.params;
 
   const coffeeStores = await fetchCoffeeStores();
   const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
@@ -58,19 +58,58 @@ const CoffeeStore = (initialProps) => {
     state: { coffeeStores },
   } = useContext(StoreContext);
 
+  const handleCreateCoffeeStore = async (coffeeStore) => {
+    try {
+      const { id, name, address, neighbourhood, voting, imgUrl } = coffeeStore;
+
+      const response = await fetch("/api/createCoffeeStore", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          name,
+          address: address || "",
+          neighbourhood: neighbourhood || "",
+          voting: 0,
+          imgUrl,
+        }),
+      });
+
+      const dbCoffeeStore = await response.json();
+      console.log(dbCoffeeStore);
+    } catch (error) {
+      console.log("Error creating coffee store: ", error);
+    }
+  };
+
   useEffect(() => {
     if (isEmpty(initialProps.coffeeStore)) {
-      const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
-        return coffeeStore.id.toString() === id;
-      });
-      setCoffeeStore(findCoffeeStoreById);
+      if (coffeeStores.length > 0) {
+        const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
+          return coffeeStore.id.toString() === id;
+        });
+
+        if (coffeeStoreFromContext) {
+          setCoffeeStore(coffeeStoreFromContext);
+          handleCreateCoffeeStore(coffeeStoreFromContext);
+        }
+      }
+    } else {
+      // SSG
+      handleCreateCoffeeStore(initialProps.coffeeStore);
     }
-  }, [id]);
+  }, [id, initialProps, initialProps.coffeeStore]);
 
   const { address, neighbourhood, name, imgUrl } = coffeeStore;
 
+  const [votingCount, setVotingCount] = useState(0);
+
   const handleUpvoteButton = () => {
     console.log("Handle upvote");
+    let count = votingCount + 1;
+    setVotingCount(count);
   };
 
   return (
@@ -114,7 +153,7 @@ const CoffeeStore = (initialProps) => {
           )}
           <div className={styles.iconWrapper}>
             <Image src="/static/icons/star.svg" width="24" height="24" />
-            <p className={styles.text}>1</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
 
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>

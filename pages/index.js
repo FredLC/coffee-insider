@@ -31,12 +31,14 @@ export default function Home(props) {
 
   useEffect(async () => {
     if (latLong) {
+      console.log(latLong);
       try {
-        const response = await fetchCoffeeStores(
+        const response = await fetch(
           `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=10`
         );
 
         const coffeeStores = await response.json();
+
         // setCoffeeStores(fetchedCoffeeStores);
         dispatch({
           type: ACTION_TYPES.SET_COFFEE_STORES,
@@ -72,8 +74,12 @@ export default function Home(props) {
         <div className={styles.heroImage}>
           <Image src="/static/hero-image.png" width={700} height={400} />
         </div>
-        {locationErrorMsg && <p>Something went wrong: {locationErrorMsg}</p>}
-        {coffeeStoresError && <p>Something went wrong: {coffeeStoresError}</p>}
+        {locationErrorMsg && (
+          <p>Something went wrong location: {locationErrorMsg}</p>
+        )}
+        {coffeeStoresError && (
+          <p>Something went wrong coffee stores: {coffeeStoresError}</p>
+        )}
 
         <div className={styles.sectionWrapper}>
           {coffeeStores.length > 0 && (
