@@ -67,7 +67,12 @@ export default function Home(props) {
           handleOnClick={handleOnBannerBtnClick}
         />
         <div className={styles.heroImage}>
-          <Image src="/static/hero-image.png" width={700} height={400} />
+          <Image
+            src="/static/hero-image.png"
+            width={700}
+            height={400}
+            alt="girl drinking coffee"
+          />
         </div>
         {locationErrorMsg && (
           <p>Something went wrong location: {locationErrorMsg}</p>
