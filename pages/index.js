@@ -58,6 +58,10 @@ export default function Home(props) {
     <div className={styles.container}>
       <Head>
         <title>Coffee Insider</title>
+        <meta
+          name="description"
+          content="Discover coffee stores near you!"
+        ></meta>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
